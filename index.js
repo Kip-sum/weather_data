@@ -1,78 +1,64 @@
 const input = document.getElementById("stateInput");
 const button = document.getElementById("getAlertsBtn");
-const output = document.getElementById("output");
-const errorEl = document.getElementById("error");
+const alertsDisplay = document.getElementById("alerts-display");
+const errorMessage = document.getElementById("error-message");
 
 // Fetch weather alerts
 async function fetchWeatherData(state) {
-  try {
-    if (!state) {
-      throw new Error("Please enter a state.");
-    }
+  const response = await fetch(
+    `https://api.weather.gov/alerts/active?area=${state}`
+  );
 
-    const response = await fetch(`https://api.weather.gov/alerts/active?area=${state}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data.");
-    }
-
-    const data = await response.json();
-    return data;
-
-  } catch (error) {
-    displayError(error.message);
-    throw error; // important for tests
+  if (!response.ok) {
+    throw new Error("Network failure");
   }
+
+  return await response.json();
 }
 
-// Display weather alerts
-function displayWeather(data, state) {
-  clearError();
+// Display weather
+function displayWeather(data) {
+  const alerts = data.features || [];
 
-  const alerts = data.features;
-
-  output.innerHTML = `
-    <h2>Current watches, warnings, and advisories for ${state}: ${alerts.length}</h2>
-  `;
+  alertsDisplay.textContent = "";
+  alertsDisplay.textContent = `Weather Alerts: ${alerts.length}`;
 
   alerts.forEach(alert => {
     const p = document.createElement("p");
     p.textContent = alert.properties.headline;
-    output.appendChild(p);
+    alertsDisplay.appendChild(p);
   });
+
+  // hide error on success
+  errorMessage.classList.add("hidden");
+  errorMessage.textContent = "";
 }
 
 // Display error
 function displayError(message) {
-  errorEl.style.display = "block";
-  errorEl.textContent = message;
+  errorMessage.classList.remove("hidden");
+  errorMessage.textContent = message;
 }
 
-// Clear error
-function clearError() {
-  errorEl.style.display = "none";
-  errorEl.textContent = "";
-}
-
-// Clear UI
-function clearUI() {
+// Clear input
+function clearInput() {
   input.value = "";
 }
 
-// Button click event
+// MAIN BUTTON CLICK
 button.addEventListener("click", async () => {
   const state = input.value.trim().toUpperCase();
 
   try {
     const data = await fetchWeatherData(state);
-    displayWeather(data, state);
-    clearUI();
+    displayWeather(data);
+    clearInput();
   } catch (error) {
-    // already handled
+    displayError(error.message);
   }
 });
 
-// Export for testing
+// export for tests
 module.exports = {
   fetchWeatherData,
   displayWeather,

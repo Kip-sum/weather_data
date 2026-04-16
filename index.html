@@ -3,20 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <title>Weather Alerts</title>
+
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
 
   <h1>Weather Alerts</h1>
 
- <input
-  id="stateInput"
-  placeholder="Enter state abbreviation"
-  type="text"
-/>
+  <input
+    id="stateInput"
+    placeholder="Enter state abbreviation"
+    type="text"
+  />
+
   <button id="getAlertsBtn">Get Weather Alerts</button>
 
-  <div id="output"></div>
-  <p id="error" style="color:red; display:none;"></p>
+  <!-- TEST EXPECTS THIS -->
+  <div id="alerts-display"></div>
+
+  <!-- TEST EXPECTS THIS -->
+  <div id="error-message" class="hidden"></div>
 
   <script src="index.js"></script>
 </body>
